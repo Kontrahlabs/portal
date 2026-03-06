@@ -1,25 +1,52 @@
-// Your unique Google Apps Script Web App URL
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxDTyEiwDgtIKSgN_KApdCVHOcYrVNtQEj424mzyl6THu9sQhWA8YYKgun8_aRqW6FX/exec";
+// PASTE YOUR WEB APP URL HERE
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxNLmzV-tXmBa71i_nTmXYA6bcqQdxPXdq1nIvGc-JeZ0vn5tpgVKHavbTrGGw2wtRt/exec";
 
 let isLoggedIn = false;
-
-// Randomized Greetings
 const loginGreetings = ["Ready to crush it,", "Welcome aboard,", "System accessed,"];
 const logoutGreetings = ["Sayonara,", "Have a great evening,", "See you tomorrow,"];
 
-// Free Quote API Integration for Daily Fuel
+// 1. Fetch Daily Quote
 async function fetchQuote() {
     try {
         const response = await fetch("https://api.quotable.io/random?tags=business|success");
         const data = await response.json();
         document.getElementById('quoteText').innerText = `"${data.content}" - ${data.author}`;
     } catch (error) {
-        // Fallback quote if the API fails
         document.getElementById('quoteText').innerText = '"The secret of getting ahead is getting started."';
     }
 }
 
-// Core Attendance Logic
+// 2. NEW: Fetch dynamic Google Sheet Data (Birthdays & Holidays)
+async function fetchSheetData() {
+    try {
+        // Calling the GET function from your Apps Script
+        const response = await fetch(WEB_APP_URL);
+        const data = await response.json();
+
+        if (data.status === "success") {
+            // Assuming Row 1 is Headers, Row 2 is the next upcoming event
+            // data.teamInfo[1][0] = Name, data.teamInfo[1][1] = Birthday Date
+            if(data.teamInfo.length > 1) {
+                document.getElementById('nextBirthday').innerText = `${data.teamInfo[1][0]} (${data.teamInfo[1][1]}) 🎂`;
+            } else {
+                document.getElementById('nextBirthday').innerText = "None listed";
+            }
+
+            // data.holidays[1][0] = Date, data.holidays[1][1] = Holiday Name
+            if(data.holidays.length > 1) {
+                document.getElementById('nextHoliday').innerText = `${data.holidays[1][1]} (${data.holidays[1][0]})`;
+            } else {
+                document.getElementById('nextHoliday').innerText = "None listed";
+            }
+        }
+    } catch (error) {
+        console.error("Could not load calendar data.");
+        document.getElementById('nextBirthday').innerText = "Offline";
+        document.getElementById('nextHoliday').innerText = "Offline";
+    }
+}
+
+// 3. Handle Attendance Login/Logout
 async function toggleStatus() {
     const userSelect = document.getElementById("teamSelector");
     const userName = userSelect.value;
@@ -27,45 +54,34 @@ async function toggleStatus() {
     const greetingText = document.getElementById("greetingText");
     const streakCount = document.getElementById("streakCount");
 
-    // Prevent action if no name is selected
     if (!userName) {
         alert("Please select your name first!");
         return;
     }
 
-    // Determine if we are logging in or logging out
     const actionType = isLoggedIn ? "logout" : "login";
-    
-    // Create the data payload matching the backend expectations
-    const payload = {
-        action: actionType,
-        name: userName
-    };
+    const payload = { action: actionType, name: userName };
 
-    // UI Feedback: Show processing state to prevent double-clicks
     const originalBtnText = actionBtn.innerText;
     actionBtn.innerText = "[ PROCESSING... ]";
     actionBtn.disabled = true;
-    actionBtn.style.opacity = "0.7";
 
     try {
-        // Send the data to your Google Sheet
-        await fetch(WEB_APP_URL, {
+        // Added redirect: 'follow' which helps with Google's backend routing
+        const response = await fetch(WEB_APP_URL, {
             method: "POST",
-            // Using text/plain prevents complex CORS preflight issues with Google Scripts
-            headers: {
-                "Content-Type": "text/plain;charset=utf-8",
-            },
-            body: JSON.stringify(payload)
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(payload),
+            redirect: "follow" 
         });
 
-        // Upon successful connection, update the UI
+        // If no network error is thrown, we proceed.
         if (actionType === "login") {
             const randomGreet = loginGreetings[Math.floor(Math.random() * loginGreetings.length)];
             greetingText.innerText = `${randomGreet} ${userName} 🚀`;
             actionBtn.innerText = "[ LOGOUT ]";
             actionBtn.classList.add("logged-in");
-            streakCount.innerText = "14 Days 🔥"; // Static for now, can be dynamic later
+            streakCount.innerText = "Active 🔥"; 
             isLoggedIn = true;
         } else {
             const randomBye = logoutGreetings[Math.floor(Math.random() * logoutGreetings.length)];
@@ -74,18 +90,17 @@ async function toggleStatus() {
             actionBtn.classList.remove("logged-in");
             streakCount.innerText = "--";
             isLoggedIn = false;
-            userSelect.value = ""; // Reset the dropdown for the next person
+            userSelect.value = ""; 
         }
     } catch (error) {
-        console.error("Error connecting to database:", error);
-        alert("Network error: Could not log attendance. Please check your connection.");
-        actionBtn.innerText = originalBtnText; // Revert button if it fails
+        console.error("Error:", error);
+        alert("Network error: Check connection or ensure Apps Script is deployed to 'Anyone'.");
     } finally {
-        // Restore button interactivity
         actionBtn.disabled = false;
-        actionBtn.style.opacity = "1";
+        if(!isLoggedIn) actionBtn.innerText = "[ LOGIN ]";
     }
 }
 
-// Initialize the dashboard on load
+// Initialize
 fetchQuote();
+fetchSheetData();
