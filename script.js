@@ -1,5 +1,5 @@
-// PASTE YOUR WEB APP URL HERE
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxNLmzV-tXmBa71i_nTmXYA6bcqQdxPXdq1nIvGc-JeZ0vn5tpgVKHavbTrGGw2wtRt/exec";
+// This URL still reads your Birthdays & Holidays
+const WEB_APP_URL = "https://script.google.com/macros/library/d/1bCqOoT4RbW8BtexFGYlNeuGdBUjzUzg67ZOkCs10dNBFYPjUSbKaAeXv/3";
 
 let isLoggedIn = false;
 const loginGreetings = ["Ready to crush it,", "Welcome aboard,", "System accessed,"];
@@ -16,23 +16,19 @@ async function fetchQuote() {
     }
 }
 
-// 2. NEW: Fetch dynamic Google Sheet Data (Birthdays & Holidays)
+// 2. Fetch dynamic Google Sheet Data (Birthdays & Holidays)
 async function fetchSheetData() {
     try {
-        // Calling the GET function from your Apps Script
         const response = await fetch(WEB_APP_URL);
         const data = await response.json();
 
         if (data.status === "success") {
-            // Assuming Row 1 is Headers, Row 2 is the next upcoming event
-            // data.teamInfo[1][0] = Name, data.teamInfo[1][1] = Birthday Date
             if(data.teamInfo.length > 1) {
                 document.getElementById('nextBirthday').innerText = `${data.teamInfo[1][0]} (${data.teamInfo[1][1]}) 🎂`;
             } else {
                 document.getElementById('nextBirthday').innerText = "None listed";
             }
 
-            // data.holidays[1][0] = Date, data.holidays[1][1] = Holiday Name
             if(data.holidays.length > 1) {
                 document.getElementById('nextHoliday').innerText = `${data.holidays[1][1]} (${data.holidays[1][0]})`;
             } else {
@@ -46,8 +42,7 @@ async function fetchSheetData() {
     }
 }
 
-// 3. Handle Attendance Login/Logout
-// 3. Handle Attendance Login/Logout
+// 3. Handle Attendance Login/Logout via Google Forms
 async function toggleStatus() {
     const userSelect = document.getElementById("teamSelector");
     const userName = userSelect.value;
@@ -60,26 +55,34 @@ async function toggleStatus() {
         return;
     }
 
-    const actionType = isLoggedIn ? "logout" : "login";
-    const payload = { action: actionType, name: userName };
+    // Capitalized to perfectly match the options in your Google Form
+    const actionType = isLoggedIn ? "Logout" : "Login"; 
 
     const originalBtnText = actionBtn.innerText;
     actionBtn.innerText = "[ PROCESSING... ]";
     actionBtn.disabled = true;
 
+    // Your specific Google Form submission URL
+    const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSd1-RjB4IAjGpaUE3HUbXU_1ADsErMWvmUeQhnJ47u3Ed9v_Q/formResponse";
+    
+    // Package the data using your unique entry IDs
+    const formData = new URLSearchParams();
+    formData.append("entry.1765779891", userName);
+    formData.append("entry.1331711757", actionType);
+
     try {
-        // THE FIX: Adding mode: 'no-cors' stops the browser from blocking Google's redirects
-        await fetch(WEB_APP_URL, {
+        // Send silently to the Form
+        await fetch(formUrl, {
             method: "POST",
-            mode: "no-cors", 
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify(payload)
+            mode: "no-cors", // This line is the magic that stops the Google security block
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: formData.toString()
         });
 
-        // Because 'no-cors' prevents us from reading Google's "success" message,
-        // we assume it worked if the network request didn't completely crash.
-        
-        if (actionType === "login") {
+        // Update UI based on action
+        if (actionType === "Login") {
             const randomGreet = loginGreetings[Math.floor(Math.random() * loginGreetings.length)];
             greetingText.innerText = `${randomGreet} ${userName} 🚀`;
             actionBtn.innerText = "[ LOGOUT ]";
@@ -104,7 +107,6 @@ async function toggleStatus() {
     }
 }
 
-// Initialize
+// Initialize everything on load
 fetchQuote();
 fetchSheetData();
-
