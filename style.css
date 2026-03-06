@@ -1,0 +1,118 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Space Mono', monospace;
+}
+
+body {
+    /* Clean, premium off-white background */
+    background: #f4f5f7; 
+    color: #111111;
+    min-height: 100vh;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dashboard-container {
+    display: grid;
+    gap: 20px;
+    width: 100%;
+    max-width: 600px;
+}
+
+/* Light Glassmorphism UI */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+}
+
+h1, h3, h4 {
+    margin-bottom: 15px;
+    letter-spacing: -1px;
+    font-weight: 700;
+}
+
+select {
+    width: 100%;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #111111;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    outline: none;
+    appearance: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* Animated Login Button - Light Mode */
+.animated-btn {
+    width: 100%;
+    padding: 15px;
+    background: #111111;
+    color: #ffffff;
+    border: 2px solid #111111;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+
+.animated-btn:hover {
+    background: transparent;
+    color: #111111;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.animated-btn.logged-in {
+    background: #ff4d4d;
+    border-color: #ff4d4d;
+    color: white;
+}
+
+.animated-btn.logged-in:hover {
+    background: transparent;
+    color: #ff4d4d;
+    box-shadow: 0 4px 15px rgba(255, 77, 77, 0.2);
+}
+
+.divider {
+    border: 0;
+    height: 1px;
+    background: rgba(0, 0, 0, 0.1);
+    margin: 15px 0;
+}
+
+.quote {
+    font-style: italic;
+    color: #555555;
+    font-size: 1.1rem;
+}
+
+.news-list {
+    list-style-type: none;
+}
+
+.news-list li {
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    color: #333333;
+}
+
+.news-list li::before {
+    content: "■ ";
+    color: #111111;
+}

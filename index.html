@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kontrah Labs | Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        
+        <div class="glass-panel main-panel">
+            <h1 id="greetingText">WELCOME 👋</h1>
+            <div class="input-group">
+                <select id="teamSelector">
+                    <option value="" disabled selected>Select Your Name ▼</option>
+                    <option value="Sangamesh">Sangamesh</option>
+                    <option value="Ansh">Ansh</option>
+                    <option value="Anand">Anand</option>
+                    <option value="Nazmul">Nazmul</option>
+                    <option value="Chandrakant">Chandrakant</option>
+                </select>
+            </div>
+            <button id="actionBtn" class="animated-btn" onclick="toggleStatus()">[ LOGIN ]</button>
+        </div>
+
+        <div class="glass-panel info-panel">
+            <h3>Today's Fuel</h3>
+            <p id="quoteText" class="quote">"Loading motivation..."</p>
+            <hr class="divider">
+            <h3>Market Pulse</h3>
+            <ul id="newsList" class="news-list">
+                <li>D2C Luxury Market expected to grow by 15% this quarter.</li>
+                <li>New retention strategies emerging for premium brands.</li>
+            </ul>
+        </div>
+
+        <div class="glass-panel stats-panel">
+            <h3>Team Ops</h3>
+            <div class="stat-row">
+                <span>🔥 Your Streak:</span>
+                <span id="streakCount">--</span>
+            </div>
+            <hr class="divider">
+            <div class="leaderboard">
+                <h4>Leaderboard (This Month)</h4>
+                <p>🥇 Ansh - 18 Days</p>
+                <p>🥈 Nazmul - 17 Days</p>
+            </div>
+        </div>
+
+        <div class="glass-panel cal-panel">
+            <h3>Upcoming 📅</h3>
+            <p><strong>Birthdays:</strong> Anand (Next Week 🎂)</p>
+            <p><strong>Holidays:</strong> Holi (March 25th)</p>
+        </div>
+
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
