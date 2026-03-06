@@ -1,5 +1,5 @@
 // Your latest Web App URL
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby9r-yj2duZ48fUVx7e3cbl1bTEtbvWvtrbu3Ynghj3E8KkS_j81WtE4PjjO4qABkVt/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbytBwM-Ml_gx6zTpz879G-oq8eZR2aG107XAUtYdEtpB34HwxLCUVMAsNoJw6uWNm5p/exec";
 
 let isLoggedIn = false;
 const loginGreetings = ["Ready to crush it,", "Welcome aboard,", "System accessed,"];
@@ -42,22 +42,7 @@ async function fetchSheetData() {
 }
 
 // Handle Attendance Login/Logout (Optimistic UI)
-function toggleStatus() {
-    const userSelect = document.getElementById("teamSelector");
-    const userName = userSelect.value;
-    const actionBtn = document.getElementById("actionBtn");
-    const greetingText = document.getElementById("greetingText");
-    const streakCount = document.getElementById("streakCount");
-
-    if (!userName) {
-        alert("Please select your name first!");
-        return;
-    }
-
-    const actionType = isLoggedIn ? "logout" : "login";
-    const payload = { action: actionType, name: userName };
-
-    // 1. Instantly Update the UI (No waiting, no loading screens)
+// 1. Instantly Update the UI (Optimistic UI)
     if (actionType === "login") {
         const randomGreet = loginGreetings[Math.floor(Math.random() * loginGreetings.length)];
         greetingText.innerText = `${randomGreet} ${userName} 🚀`;
@@ -75,18 +60,21 @@ function toggleStatus() {
         userSelect.value = ""; 
     }
 
-    // 2. Fire the data to Google silently in the background
+    // THE FIX: Package the data exactly like a standard HTML form
+    const formData = new URLSearchParams();
+    formData.append("action", actionType);
+    formData.append("name", userName);
+
+    // 2. Fire the data to Google without CORS issues
     fetch(WEB_APP_URL, {
         method: "POST",
-        mode: "no-cors", 
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(payload)
-    }).catch(err => {
-        // Any browser block is ignored here so the user never sees an error
-        console.log("Background sync complete."); 
-    });
+        body: formData // This automatically sets the correct, safe Content-Type
+    })
+    .then(response => console.log("Data successfully transmitted!"))
+    .catch(err => console.error("Background sync failed:", err));
 }
 
 // Initialize
 fetchQuote();
 fetchSheetData();
+
