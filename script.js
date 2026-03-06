@@ -5,7 +5,7 @@ let isLoggedIn = false;
 const loginGreetings = ["Ready to crush it,", "Welcome aboard,", "System accessed,"];
 const logoutGreetings = ["Sayonara,", "Have a great evening,", "See you tomorrow,"];
 
-// 1. Give the app "Memory" when a name is selected
+// 1. Give the app "Memory"
 document.getElementById("teamSelector").addEventListener("change", function() {
     const userName = this.value;
     const storedState = localStorage.getItem("status_" + userName);
@@ -60,61 +60,16 @@ async function fetchSheetData() {
     }
 }
 
-// 4. Handle Attendance via Google Forms
-async function toggleStatus() {
-    const userSelect = document.getElementById("teamSelector");
-    const userName = userSelect.value;
-    const actionBtn = document.getElementById("actionBtn");
-    const greetingText = document.getElementById("greetingText");
-    const streakCount = document.getElementById("streakCount");
+// 4. THE BULLETPROOF GOOGLE FORM SUBMISSION
+function submitToGoogleForm(userName, actionType) {
+    // Create a hidden iframe
+    const iframeName = "hidden_iframe_" + Math.random().toString(36).substring(7);
+    const iframe = document.createElement("iframe");
+    iframe.name = iframeName;
+    iframe.style.display = "none";
+    document.body.appendChild(iframe);
 
-    if (!userName) {
-        alert("Please select your name first!");
-        return;
-    }
-
-    // Capitalized exactly how your Google Form expects it
-    const actionType = isLoggedIn ? "Logout" : "Login"; 
-
-    // Instantly Update UI & Save to Phone Memory
-    if (actionType === "Login") {
-        const randomGreet = loginGreetings[Math.floor(Math.random() * loginGreetings.length)];
-        greetingText.innerText = `${randomGreet} ${userName} 🚀`;
-        actionBtn.innerText = "[ LOGOUT ]";
-        actionBtn.classList.add("logged-in");
-        streakCount.innerText = "Active 🔥"; 
-        isLoggedIn = true;
-        localStorage.setItem("status_" + userName, "logged_in");
-    } else {
-        const randomBye = logoutGreetings[Math.floor(Math.random() * logoutGreetings.length)];
-        greetingText.innerText = `${randomBye} ${userName} 👋`;
-        actionBtn.innerText = "[ LOGIN ]";
-        actionBtn.classList.remove("logged-in");
-        streakCount.innerText = "--";
-        isLoggedIn = false;
-        localStorage.setItem("status_" + userName, "logged_out");
-        userSelect.value = ""; 
-    }
-
-    // Your specific Google Form submission URL
-    const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSd1-RjB4IAjGpaUE3HUbXU_1ADsErMWvmUeQhnJ47u3Ed9v_Q/formResponse";
-    
-    // Package data using your unique Google Form entry IDs
-    const formData = new URLSearchParams();
-    formData.append("entry.1765779891", userName);
-    formData.append("entry.1331711757", actionType);
-
-    // Send silently to the Form
-    fetch(formUrl, {
-        method: "POST",
-        mode: "no-cors", 
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: formData.toString()
-    }).catch(err => console.log("Form submitted seamlessly."));
-}
-
-// Initialize on load
-fetchQuote();
-fetchSheetData();
+    // Create a hidden HTML form pointing to your specific Google Form
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "
