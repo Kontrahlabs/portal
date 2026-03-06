@@ -47,6 +47,7 @@ async function fetchSheetData() {
 }
 
 // 3. Handle Attendance Login/Logout
+// 3. Handle Attendance Login/Logout
 async function toggleStatus() {
     const userSelect = document.getElementById("teamSelector");
     const userName = userSelect.value;
@@ -67,15 +68,17 @@ async function toggleStatus() {
     actionBtn.disabled = true;
 
     try {
-        // Added redirect: 'follow' which helps with Google's backend routing
-        const response = await fetch(WEB_APP_URL, {
+        // THE FIX: Adding mode: 'no-cors' stops the browser from blocking Google's redirects
+        await fetch(WEB_APP_URL, {
             method: "POST",
+            mode: "no-cors", 
             headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify(payload),
-            redirect: "follow" 
+            body: JSON.stringify(payload)
         });
 
-        // If no network error is thrown, we proceed.
+        // Because 'no-cors' prevents us from reading Google's "success" message,
+        // we assume it worked if the network request didn't completely crash.
+        
         if (actionType === "login") {
             const randomGreet = loginGreetings[Math.floor(Math.random() * loginGreetings.length)];
             greetingText.innerText = `${randomGreet} ${userName} 🚀`;
@@ -94,7 +97,7 @@ async function toggleStatus() {
         }
     } catch (error) {
         console.error("Error:", error);
-        alert("Network error: Check connection or ensure Apps Script is deployed to 'Anyone'.");
+        alert("Network error: Please check your internet connection.");
     } finally {
         actionBtn.disabled = false;
         if(!isLoggedIn) actionBtn.innerText = "[ LOGIN ]";
@@ -104,3 +107,4 @@ async function toggleStatus() {
 // Initialize
 fetchQuote();
 fetchSheetData();
+
