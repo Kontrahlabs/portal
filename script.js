@@ -1,4 +1,4 @@
-// This URL still reads your Birthdays & Holidays
+// This URL reads your Birthdays & Holidays
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwkA2gNxY2cRroCfSyf7GAUU955DxsFZtz3LLvfjUje_G1xyPY02tvbTWIc0Rvn7P8v/exec";
 
 let isLoggedIn = false;
@@ -55,10 +55,9 @@ async function toggleStatus() {
         return;
     }
 
-    // Capitalized to perfectly match the options in your Google Form
     const actionType = isLoggedIn ? "Logout" : "Login"; 
 
-    const originalBtnText = actionBtn.innerText;
+    // Lock the button and show processing
     actionBtn.innerText = "[ PROCESSING... ]";
     actionBtn.disabled = true;
 
@@ -74,36 +73,43 @@ async function toggleStatus() {
         // Send silently to the Form
         await fetch(formUrl, {
             method: "POST",
-            mode: "no-cors", // This line is the magic that stops the Google security block
+            mode: "no-cors", // Bypasses Google security blocks
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
             body: formData.toString()
         });
 
-        // Update UI based on action
-        if (actionType === "Login") {
-            const randomGreet = loginGreetings[Math.floor(Math.random() * loginGreetings.length)];
-            greetingText.innerText = `${randomGreet} ${userName} 🚀`;
-            actionBtn.innerText = "[ LOGOUT ]";
-            actionBtn.classList.add("logged-in");
-            streakCount.innerText = "Active 🔥"; 
-            isLoggedIn = true;
-        } else {
-            const randomBye = logoutGreetings[Math.floor(Math.random() * logoutGreetings.length)];
-            greetingText.innerText = `${randomBye} ${userName} 👋`;
-            actionBtn.innerText = "[ LOGIN ]";
-            actionBtn.classList.remove("logged-in");
-            streakCount.innerText = "--";
-            isLoggedIn = false;
-            userSelect.value = ""; 
-        }
+        // Add a 1.5 second delay to show the "PROCESSING..." text
+        setTimeout(() => {
+            if (actionType === "Login") {
+                const randomGreet = loginGreetings[Math.floor(Math.random() * loginGreetings.length)];
+                greetingText.innerText = `${randomGreet} ${userName} 🚀`;
+                actionBtn.innerText = "[ LOGOUT ]";
+                actionBtn.classList.add("logged-in");
+                streakCount.innerText = "Active 🔥"; 
+                isLoggedIn = true;
+            } else {
+                const randomBye = logoutGreetings[Math.floor(Math.random() * logoutGreetings.length)];
+                greetingText.innerText = `${randomBye} ${userName} 👋`;
+                actionBtn.innerText = "[ LOGIN ]";
+                actionBtn.classList.remove("logged-in");
+                streakCount.innerText = "--";
+                isLoggedIn = false;
+                userSelect.value = ""; 
+            }
+            
+            // Re-enable the button after the process is complete
+            actionBtn.disabled = false;
+        }, 1500); // 1500 milliseconds = 1.5 seconds
+
     } catch (error) {
         console.error("Error:", error);
         alert("Network error: Please check your internet connection.");
-    } finally {
+        
+        // If it fails, revert the button back to normal so they can try again
+        actionBtn.innerText = isLoggedIn ? "[ LOGOUT ]" : "[ LOGIN ]";
         actionBtn.disabled = false;
-        if(!isLoggedIn) actionBtn.innerText = "[ LOGIN ]";
     }
 }
 
