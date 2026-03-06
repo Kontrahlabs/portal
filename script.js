@@ -1,5 +1,5 @@
 // Your latest Web App URL
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbytBwM-Ml_gx6zTpz879G-oq8eZR2aG107XAUtYdEtpB34HwxLCUVMAsNoJw6uWNm5p/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwtX6VFskbwnYkfxYD90LRbilOmZagsWdDOgvyxaXlkF1d8KS3TGfew5iwHdMmat375/exec";
 
 let isLoggedIn = false;
 const loginGreetings = ["Ready to crush it,", "Welcome aboard,", "System accessed,"];
@@ -77,4 +77,5 @@ async function fetchSheetData() {
 // Initialize
 fetchQuote();
 fetchSheetData();
+
 
