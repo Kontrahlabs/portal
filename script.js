@@ -1,5 +1,5 @@
 // This URL still reads your Birthdays & Holidays
-const WEB_APP_URL = "https://script.google.com/macros/library/d/1bCqOoT4RbW8BtexFGYlNeuGdBUjzUzg67ZOkCs10dNBFYPjUSbKaAeXv/3";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxDTyEiwDgtIKSgN_KApdCVHOcYrVNtQEj424mzyl6THu9sQhWA8YYKgun8_aRqW6FX/exec";
 
 let isLoggedIn = false;
 const loginGreetings = ["Ready to crush it,", "Welcome aboard,", "System accessed,"];
@@ -63,7 +63,7 @@ async function toggleStatus() {
     actionBtn.disabled = true;
 
     // Your specific Google Form submission URL
-    const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSd1-RjB4IAjGpaUE3HUbXU_1ADsErMWvmUeQhnJ47u3Ed9v_Q/formResponse";
+    const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSd1-RjB4IAjGpaUE3HUbXU_1ADsErMWvmUeQhnJ47u3Ed9v_Q/viewform?usp=header";
     
     // Package the data using your unique entry IDs
     const formData = new URLSearchParams();
